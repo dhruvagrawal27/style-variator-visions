@@ -216,7 +216,7 @@ const Index = () => {
               <Label className="text-lg font-semibold text-gray-800">
                 📸 Upload Your Image
               </Label>
-              <Image Upload
+              <ImageUpload
                 onImageSelect={handleImageSelect}
                 error={errors.image}
               />
