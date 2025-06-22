@@ -210,6 +210,7 @@ const FormProvider = () => {
             firstImageUrl={results.firstImageUrl}
             downloadUrl={results.downloadUrl}
             email={formData.email}
+            variationCount={formData.variationCount}
           />
           
           <div className="text-center mt-8">

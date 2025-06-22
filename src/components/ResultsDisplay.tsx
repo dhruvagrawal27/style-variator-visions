@@ -6,10 +6,22 @@ interface ResultsDisplayProps {
   firstImageUrl?: string;
   downloadUrl?: string;
   email: string;
+  variationCount: number;
 }
 
-const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayProps) => {
-  // Check if it's a Google Drive ViewLink
+const ResultsDisplay = ({ firstImageUrl, downloadUrl, email, variationCount }: ResultsDisplayProps) => {
+  // Convert Google Drive ViewLink to direct image URL
+  const getDirectImageUrl = (url: string) => {
+    if (url.includes('drive.google.com') && url.includes('/file/d/')) {
+      const fileId = url.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1];
+      if (fileId) {
+        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+    }
+    return url;
+  };
+
+  const displayImageUrl = firstImageUrl ? getDirectImageUrl(firstImageUrl) : null;
   const isGoogleDriveLink = firstImageUrl?.includes('drive.google.com');
   
   return (
@@ -24,39 +36,37 @@ const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayPro
         </p>
       </div>
 
-      {firstImageUrl ? (
+      {/* Variation count messaging */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+        <p className="text-sm text-blue-700">
+          {variationCount > 1 
+            ? `📸 ${variationCount} variations created! Last variation shown below, all variations sent to your email.`
+            : '📸 Your stylized variation is ready!'
+          }
+        </p>
+      </div>
+
+      {displayImageUrl ? (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            {isGoogleDriveLink ? 'Your Variations Are Ready!' : 'Preview - First Variation:'}
+            {variationCount > 1 ? 'Preview - Last Variation:' : 'Your Stylized Image:'}
           </h3>
           
-          {isGoogleDriveLink ? (
-            <div className="p-6 bg-green-50 border-2 border-green-200 rounded-xl">
-              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-500" />
-              <p className="text-green-700 font-medium mb-2">
-                ✅ All variations processed successfully!
-              </p>
-              <p className="text-sm text-green-600">
-                Your stylized images are ready for download
-              </p>
+          <div className="relative inline-block">
+            <img
+              src={displayImageUrl}
+              alt={variationCount > 1 ? 'Last AI variation' : 'AI variation'}
+              className="max-w-full max-h-64 rounded-xl shadow-lg mx-auto animate-scale-in"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <div className="hidden text-gray-500 p-4 border-2 border-dashed border-gray-300 rounded-xl">
+              <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Image preview not available</p>
             </div>
-          ) : (
-            <div className="relative inline-block">
-              <img
-                src={firstImageUrl}
-                alt="First AI variation"
-                className="max-w-full max-h-64 rounded-xl shadow-lg mx-auto animate-scale-in"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                }}
-              />
-              <div className="hidden text-gray-500 p-4 border-2 border-dashed border-gray-300 rounded-xl">
-                <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Preview image will be available shortly</p>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       ) : (
         <div className="mb-6">
@@ -70,9 +80,9 @@ const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayPro
       {downloadUrl ? (
         <div className="space-y-4">
           <p className="text-gray-700 font-medium">
-            {isGoogleDriveLink ? 
-              'Your stylized variations are ready for download!' : 
-              'All your stylized variations are ready for download!'
+            {variationCount > 1 
+              ? 'All your stylized variations are ready for download!'
+              : 'Your stylized variation is ready for download!'
             }
           </p>
           <Button
