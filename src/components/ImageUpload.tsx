@@ -10,41 +10,47 @@ interface ImageUploadProps {
 }
 
 const ImageUpload = ({ onImageSelect, error }: ImageUploadProps) => {
-  const [uploadMethod, setUploadMethod] = useState<'file' | 'url'>('file');
+  const [uploadMethod, setUploadMethod] = useState<'file' | 'url' | 'both'>('file');
   const [imageUrl, setImageUrl] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      onImageSelect(file, null);
-      setImageUrl('');
+      setFilePreviewUrl(url);
+      onImageSelect(file, uploadMethod === 'both' ? imageUrl || null : null);
     }
   };
 
   const handleUrlChange = (url: string) => {
     setImageUrl(url);
-    if (url) {
-      setPreviewUrl(url);
-      onImageSelect(null, url);
-      setSelectedFile(null);
-    }
+    onImageSelect(uploadMethod === 'both' ? selectedFile : null, url || null);
   };
 
-  const clearSelection = () => {
+  const clearFile = () => {
     setSelectedFile(null);
+    setFilePreviewUrl(null);
+    onImageSelect(null, uploadMethod === 'both' ? imageUrl || null : null);
+  };
+
+  const clearUrl = () => {
     setImageUrl('');
-    setPreviewUrl(null);
+    onImageSelect(uploadMethod === 'both' ? selectedFile : null, null);
+  };
+
+  const clearAll = () => {
+    setSelectedFile(null);
+    setFilePreviewUrl(null);
+    setImageUrl('');
     onImageSelect(null, null);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 justify-center">
+      <div className="flex gap-2 justify-center flex-wrap">
         <Button
           type="button"
           variant={uploadMethod === 'file' ? 'default' : 'outline'}
@@ -63,9 +69,17 @@ const ImageUpload = ({ onImageSelect, error }: ImageUploadProps) => {
           <Link className="w-4 h-4 mr-2" />
           Image URL
         </Button>
+        <Button
+          type="button"
+          variant={uploadMethod === 'both' ? 'default' : 'outline'}
+          onClick={() => setUploadMethod('both')}
+          className="rounded-full"
+        >
+          📎 Both
+        </Button>
       </div>
 
-      {uploadMethod === 'file' ? (
+      {(uploadMethod === 'file' || uploadMethod === 'both') && (
         <div className="relative">
           <input
             type="file"
@@ -85,7 +99,9 @@ const ImageUpload = ({ onImageSelect, error }: ImageUploadProps) => {
             <p className="text-sm text-gray-500">JPG, JPEG, PNG files supported</p>
           </label>
         </div>
-      ) : (
+      )}
+
+      {(uploadMethod === 'url' || uploadMethod === 'both') && (
         <div className="space-y-3">
           <Input
             type="url"
@@ -100,20 +116,59 @@ const ImageUpload = ({ onImageSelect, error }: ImageUploadProps) => {
         </div>
       )}
 
-      {previewUrl && (
-        <div className="relative inline-block">
-          <img
-            src={previewUrl}
-            alt="Preview"
-            className="max-w-full max-h-40 rounded-xl shadow-lg mx-auto block"
-          />
-          <button
+      {/* Preview sections */}
+      <div className="space-y-4">
+        {filePreviewUrl && (
+          <div className="relative inline-block">
+            <img
+              src={filePreviewUrl}
+              alt="File Preview"
+              className="max-w-full max-h-40 rounded-xl shadow-lg mx-auto block"
+            />
+            <button
+              type="button"
+              onClick={clearFile}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <p className="text-xs text-gray-500 text-center mt-2">📁 File Upload</p>
+          </div>
+        )}
+
+        {imageUrl && (
+          <div className="relative inline-block">
+            <img
+              src={imageUrl}
+              alt="URL Preview"
+              className="max-w-full max-h-40 rounded-xl shadow-lg mx-auto block"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <button
+              type="button"
+              onClick={clearUrl}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <p className="text-xs text-gray-500 text-center mt-2">🔗 URL Image</p>
+          </div>
+        )}
+      </div>
+
+      {(selectedFile || imageUrl) && uploadMethod === 'both' && (
+        <div className="text-center">
+          <Button
             type="button"
-            onClick={clearSelection}
-            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+            onClick={clearAll}
+            variant="outline"
+            size="sm"
+            className="rounded-full"
           >
-            <X className="w-4 h-4" />
-          </button>
+            Clear All
+          </Button>
         </div>
       )}
 

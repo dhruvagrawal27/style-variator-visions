@@ -45,6 +45,7 @@ const FormProvider = () => {
       newErrors.email = 'Please enter a valid email';
     }
     
+    // Allow both file and URL - n8n will handle the logic
     if (!formData.imageFile && !formData.imageUrl) {
       newErrors.image = 'Please upload an image or provide an image URL';
     }
@@ -83,9 +84,11 @@ const FormProvider = () => {
       submitData.append('quality', formData.quality);
       submitData.append('styleNotes', formData.styleNotes);
       
+      // Allow both file and URL to be sent - let n8n handle the priority
       if (formData.imageFile) {
         submitData.append('image', formData.imageFile);
-      } else if (formData.imageUrl) {
+      }
+      if (formData.imageUrl) {
         submitData.append('imageUrl', formData.imageUrl);
       }
 
@@ -109,9 +112,10 @@ const FormProvider = () => {
       const result = await response.json();
       console.log('Webhook response:', result);
       
+      // Handle both possible response formats from n8n
       setResults({
-        firstImageUrl: result.firstImageUrl,
-        downloadUrl: result.downloadUrl
+        firstImageUrl: result.firstImageUrl || result.previewImage || result.imageUrl,
+        downloadUrl: result.downloadUrl || result.driveLink
       });
 
       toast({
@@ -121,11 +125,21 @@ const FormProvider = () => {
 
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast({
-        title: "Oops! Something went wrong",
-        description: "Please try again in a moment. Our AI is working hard!",
-        variant: "destructive",
-      });
+      
+      // More specific error handling
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        toast({
+          title: "Connection Error",
+          description: "Unable to reach our AI service. Please check your internet connection and try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Oops! Something went wrong",
+          description: "Our AI is trying very hard! Please try again in a moment.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }

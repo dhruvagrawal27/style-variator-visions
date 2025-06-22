@@ -1,5 +1,5 @@
 
-import { Download, CheckCircle } from 'lucide-react';
+import { Download, CheckCircle, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ResultsDisplayProps {
@@ -21,18 +21,35 @@ const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayPro
         </p>
       </div>
 
-      {firstImageUrl && (
+      {firstImageUrl ? (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">Preview - First Variation:</h3>
-          <img
-            src={firstImageUrl}
-            alt="First AI variation"
-            className="max-w-full max-h-64 rounded-xl shadow-lg mx-auto animate-scale-in"
-          />
+          <div className="relative inline-block">
+            <img
+              src={firstImageUrl}
+              alt="First AI variation"
+              className="max-w-full max-h-64 rounded-xl shadow-lg mx-auto animate-scale-in"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <div className="hidden text-gray-500 p-4 border-2 border-dashed border-gray-300 rounded-xl">
+              <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Preview image will be available shortly</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="mb-6">
+          <div className="text-gray-500 p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+            <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Your variation preview will appear here soon!</p>
+          </div>
         </div>
       )}
 
-      {downloadUrl && (
+      {downloadUrl ? (
         <div className="space-y-4">
           <p className="text-gray-700 font-medium">
             All your stylized variations are ready for download!
@@ -46,6 +63,17 @@ const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayPro
               Download All Variations
             </a>
           </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <p className="text-gray-700 font-medium">
+            Processing complete! Download link sent to your email.
+          </p>
+          <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <p className="text-sm text-blue-700">
+              📧 Check your email for the Google Drive download link
+            </p>
+          </div>
         </div>
       )}
 
