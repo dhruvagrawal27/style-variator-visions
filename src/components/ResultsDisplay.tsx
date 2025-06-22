@@ -9,6 +9,9 @@ interface ResultsDisplayProps {
 }
 
 const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayProps) => {
+  // Check if it's a Google Drive ViewLink
+  const isGoogleDriveLink = firstImageUrl?.includes('drive.google.com');
+  
   return (
     <div className="magic-card p-8 text-center animate-fade-in">
       <div className="mb-6">
@@ -23,22 +26,37 @@ const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayPro
 
       {firstImageUrl ? (
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Preview - First Variation:</h3>
-          <div className="relative inline-block">
-            <img
-              src={firstImageUrl}
-              alt="First AI variation"
-              className="max-w-full max-h-64 rounded-xl shadow-lg mx-auto animate-scale-in"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-            <div className="hidden text-gray-500 p-4 border-2 border-dashed border-gray-300 rounded-xl">
-              <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">Preview image will be available shortly</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            {isGoogleDriveLink ? 'Your Variations Are Ready!' : 'Preview - First Variation:'}
+          </h3>
+          
+          {isGoogleDriveLink ? (
+            <div className="p-6 bg-green-50 border-2 border-green-200 rounded-xl">
+              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-500" />
+              <p className="text-green-700 font-medium mb-2">
+                ✅ All variations processed successfully!
+              </p>
+              <p className="text-sm text-green-600">
+                Your stylized images are ready for download
+              </p>
             </div>
-          </div>
+          ) : (
+            <div className="relative inline-block">
+              <img
+                src={firstImageUrl}
+                alt="First AI variation"
+                className="max-w-full max-h-64 rounded-xl shadow-lg mx-auto animate-scale-in"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <div className="hidden text-gray-500 p-4 border-2 border-dashed border-gray-300 rounded-xl">
+                <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Preview image will be available shortly</p>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="mb-6">
@@ -52,7 +70,10 @@ const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayPro
       {downloadUrl ? (
         <div className="space-y-4">
           <p className="text-gray-700 font-medium">
-            All your stylized variations are ready for download!
+            {isGoogleDriveLink ? 
+              'Your stylized variations are ready for download!' : 
+              'All your stylized variations are ready for download!'
+            }
           </p>
           <Button
             asChild
@@ -60,7 +81,7 @@ const ResultsDisplay = ({ firstImageUrl, downloadUrl, email }: ResultsDisplayPro
           >
             <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
               <Download className="w-5 h-5 mr-2" />
-              Download All Variations
+              {isGoogleDriveLink ? 'Open Google Drive' : 'Download All Variations'}
             </a>
           </Button>
         </div>

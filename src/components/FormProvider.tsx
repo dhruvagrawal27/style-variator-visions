@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -109,18 +108,54 @@ const FormProvider = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-      console.log('Webhook response:', result);
+      // Check if response has content before trying to parse JSON
+      const responseText = await response.text();
+      console.log('Webhook response text:', responseText);
+
+      let result;
+      if (responseText.trim()) {
+        try {
+          result = JSON.parse(responseText);
+          console.log('Webhook response parsed:', result);
+        } catch (parseError) {
+          console.log('Response is not JSON, treating as text:', responseText);
+          result = { message: responseText };
+        }
+      } else {
+        console.log('Empty response, assuming success');
+        result = { message: 'Request processed successfully' };
+      }
       
-      // Handle both possible response formats from n8n
+      // Handle the new response format with ViewLink
+      let firstImageUrl = null;
+      let downloadUrl = null;
+
+      // Check if result is an array (your new format)
+      if (Array.isArray(result) && result.length > 0 && result[0].ViewLink) {
+        firstImageUrl = result[0].ViewLink;
+        downloadUrl = result[0].ViewLink;
+      } 
+      // Handle single object with ViewLink
+      else if (result.ViewLink) {
+        firstImageUrl = result.ViewLink;
+        downloadUrl = result.ViewLink;
+      }
+      // Handle existing formats
+      else {
+        firstImageUrl = result.firstImageUrl || result.previewImage || result.imageUrl;
+        downloadUrl = result.downloadUrl || result.driveLink;
+      }
+
+      console.log('Processed URLs:', { firstImageUrl, downloadUrl });
+      
       setResults({
-        firstImageUrl: result.firstImageUrl || result.previewImage || result.imageUrl,
-        downloadUrl: result.downloadUrl || result.driveLink
+        firstImageUrl,
+        downloadUrl
       });
 
       toast({
         title: "Success! ✨",
-        description: "Your AI variations are being created and will be sent to your email!",
+        description: "Your AI variations are ready! Check your email for the download link.",
       });
 
     } catch (error) {
