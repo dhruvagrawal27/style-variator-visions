@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -99,5 +100,29 @@
 
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(135deg, #E6E6FA 0%, #FFB6C1 50%, #B0E0E6 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .magic-card {
+    @apply bg-card-gradient backdrop-blur-sm border border-white/20 rounded-3xl shadow-xl;
+  }
+  
+  .magic-button {
+    @apply bg-button-gradient text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300;
+  }
+  
+  .sparkle-effect {
+    position: relative;
+  }
+  
+  .sparkle-effect::before {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    animation: sparkle 2s ease-in-out infinite;
   }
 }
