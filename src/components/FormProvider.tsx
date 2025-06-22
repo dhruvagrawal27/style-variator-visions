@@ -99,7 +99,7 @@ const FormProvider = () => {
         hasUrl: !!formData.imageUrl
       });
 
-      const response = await fetch('https://dhruvthc.app.n8n.cloud/webhook-test/e24c660d-a564-483e-af8b-793785550ca1', {
+      const response = await fetch('https://dhruvthc.app.n8n.cloud/webhook/e24c660d-a564-483e-af8b-793785550ca1', {
         method: 'POST',
         body: submitData,
       });
