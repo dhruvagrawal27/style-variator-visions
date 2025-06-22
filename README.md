@@ -1,4 +1,6 @@
-# Style Variator Visions
+![DreamRender Logo](public/dreamrender-logo.png)
+
+# DreamRender
 
 Transform your images into stunning, AI-generated artistic variations with ease. This web app leverages advanced AI models to create multiple stylized versions of your uploaded image, delivering results directly to your inbox.
 
