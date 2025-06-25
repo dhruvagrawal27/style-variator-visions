@@ -193,7 +193,7 @@ const LandingPage = () => {
                 Perfect for Every Creative Professional
               </h3>
               <p className="text-xl text-gray-300">
-                Join thousands of professionals already using ArtForge AI
+                Join thousands of professionals already using DreamRender AI
               </p>
             </div>
             
@@ -253,7 +253,7 @@ const LandingPage = () => {
                 </div>
                 <div>
                   <div className="text-4xl font-bold text-green-400 mb-2">Free</div>
-                  <div className="text-gray-300">ArtForge AI Trial</div>
+                  <div className="text-gray-300">DreamRender AI Trial</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-cyan-400 mb-2">Pay per use</div>
@@ -271,7 +271,7 @@ const LandingPage = () => {
               Ready to Transform Your Creative Process?
             </h3>
             <p className="text-2xl text-gray-300 mb-12 leading-relaxed">
-              Join thousands of creators, marketers, and agencies using ArtForge AI to produce 
+              Join thousands of creators, marketers, and agencies using DreamRender AI to produce 
               stunning visuals and high-converting ads in seconds
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
@@ -311,7 +311,7 @@ const LandingPage = () => {
           <div className="max-w-6xl mx-auto text-center">
             <div className="flex items-center justify-center mb-6">
               <Sparkles className="w-8 h-8 text-purple-400 mr-3" />
-              <span className="text-2xl font-bold text-white">ArtForge AI</span>
+              <span className="text-2xl font-bold text-white">DreamRender AI</span>
             </div>
             <p className="text-gray-400 mb-6">
               Empowering creativity through artificial intelligence

@@ -10,7 +10,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
             <Sparkles className="w-8 h-8 text-purple-400" />
-            <span className="text-xl font-bold text-white">ArtForge AI</span>
+            <span className="text-xl font-bold text-white">DreamRender AI</span>
           </Link>
           
           <div className="flex items-center space-x-4">
