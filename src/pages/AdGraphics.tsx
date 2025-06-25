@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Navigation from '@/components/Navigation';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { Target, Upload, X } from 'lucide-react';
+import { Target, Upload, X, CheckCircle, Download, Image } from 'lucide-react';
 
 interface AdFormData {
   variationCount: number;
@@ -19,6 +19,11 @@ interface AdFormData {
   imageFile: File | null;
   personDetails: string;
   otherRequirements: string;
+}
+
+interface AdResults {
+  viewLink?: string;
+  downloadUrl?: string;
 }
 
 const AdGraphics = () => {
@@ -36,9 +41,21 @@ const AdGraphics = () => {
   });
   
   const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<AdResults | null>(null);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Convert Google Drive ViewLink to direct image URL
+  const getDirectImageUrl = (url: string) => {
+    if (url.includes('drive.google.com') && url.includes('/file/d/')) {
+      const fileId = url.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1];
+      if (fileId) {
+        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+    }
+    return url;
+  };
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
@@ -91,6 +108,23 @@ const AdGraphics = () => {
     setImagePreview(null);
   };
 
+  const resetForm = () => {
+    setResults(null);
+    setFormData({
+      variationCount: 3,
+      headline: '',
+      subHeading: '',
+      pointers: '',
+      cta: '',
+      buttonText: '',
+      email: '',
+      imageFile: null,
+      personDetails: '',
+      otherRequirements: ''
+    });
+    setImagePreview(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -138,25 +172,53 @@ const AdGraphics = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      toast({
-        title: "Success! 🎯",
-        description: "Your high-conversion ad graphics are being generated! Check your email soon.",
-      });
+      const responseText = await response.text();
+      console.log('Webhook response text:', responseText);
 
-      // Reset form
-      setFormData({
-        variationCount: 3,
-        headline: '',
-        subHeading: '',
-        pointers: '',
-        cta: '',
-        buttonText: '',
-        email: '',
-        imageFile: null,
-        personDetails: '',
-        otherRequirements: ''
-      });
-      setImagePreview(null);
+      let result;
+      if (responseText.trim()) {
+        try {
+          result = JSON.parse(responseText);
+          console.log('Webhook response parsed:', result);
+        } catch (parseError) {
+          console.log('Response is not JSON, treating as text:', responseText);
+          result = { message: responseText };
+        }
+      } else {
+        console.log('Empty response, assuming success');
+        result = { message: 'Request processed successfully' };
+      }
+
+      // Handle the response format: [{ "ViewLink": "..." }] or { "ViewLink": "..." }
+      let viewLink = null;
+      let downloadUrl = null;
+
+      if (Array.isArray(result) && result.length > 0 && result[0].ViewLink) {
+        viewLink = result[0].ViewLink;
+        downloadUrl = result[0].ViewLink;
+      } else if (result.ViewLink) {
+        viewLink = result.ViewLink;
+        downloadUrl = result.ViewLink;
+      }
+
+      console.log('Processed URLs:', { viewLink, downloadUrl });
+
+      if (viewLink) {
+        setResults({
+          viewLink,
+          downloadUrl
+        });
+
+        toast({
+          title: "Success! 🎯",
+          description: "Your high-conversion ad graphics are ready! Preview shown below.",
+        });
+      } else {
+        toast({
+          title: "Success! 🎯",
+          description: "Your high-conversion ad graphics are being generated! Check your email soon.",
+        });
+      }
 
     } catch (error) {
       console.error('Error submitting ad graphics form:', error);
@@ -176,6 +238,119 @@ const AdGraphics = () => {
         <Navigation />
         <div className="pt-16 flex items-center justify-center min-h-screen">
           <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
+
+  // Show results page if we have results
+  if (results) {
+    const displayImageUrl = results.viewLink ? getDirectImageUrl(results.viewLink) : null;
+    const isGoogleDriveLink = results.viewLink?.includes('drive.google.com');
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cyan-900 via-blue-900 to-purple-900">
+        <Navigation />
+        <div className="pt-24 pb-12 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 text-center">
+              <div className="mb-6">
+                <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4 animate-bounce" />
+                <h2 className="text-3xl font-bold text-white mb-2">
+                  🎉 Your AI Ad Graphics Are Ready!
+                </h2>
+                <p className="text-gray-300">
+                  Generated {formData.variationCount} variation{formData.variationCount > 1 ? 's' : ''} and sent to <strong>{formData.email}</strong>
+                </p>
+              </div>
+
+              {/* Variation count messaging */}
+              <div className="mb-6 p-4 bg-cyan-500/20 border border-cyan-400/30 rounded-xl">
+                <p className="text-sm text-cyan-200">
+                  {formData.variationCount > 1 
+                    ? `🎨 ${formData.variationCount} ad variations created! Preview of the generated design shown below.`
+                    : '🎨 Your ad graphic is ready!'
+                  }
+                </p>
+              </div>
+
+              {displayImageUrl ? (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-white mb-3">
+                    {formData.variationCount > 1 ? 'Preview - Generated Ad Design:' : 'Your Generated Ad:'}
+                  </h3>
+                  
+                  <div className="relative inline-block">
+                    <img
+                      src={displayImageUrl}
+                      alt={formData.variationCount > 1 ? 'Generated ad variation' : 'Generated ad'}
+                      className="max-w-full max-h-96 rounded-xl shadow-lg mx-auto"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                    <div className="hidden text-gray-300 p-4 border-2 border-dashed border-gray-400 rounded-xl bg-white/5">
+                      <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">Image preview not available</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-6">
+                  <div className="text-gray-300 p-6 border-2 border-dashed border-gray-400 rounded-xl bg-white/5">
+                    <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Your ad preview will appear here soon!</p>
+                  </div>
+                </div>
+              )}
+
+              {results.downloadUrl ? (
+                <div className="space-y-4 mb-6">
+                  <p className="text-gray-200 font-medium">
+                    {formData.variationCount > 1 
+                      ? 'All your ad variations are ready for download!'
+                      : 'Your ad graphic is ready for download!'
+                    }
+                  </p>
+                  <Button
+                    asChild
+                    className="bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-white"
+                  >
+                    <a href={results.downloadUrl} target="_blank" rel="noopener noreferrer">
+                      <Download className="w-5 h-5 mr-2" />
+                      {isGoogleDriveLink ? 'Open Google Drive' : 'Download All Variations'}
+                    </a>
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4 mb-6">
+                  <p className="text-gray-200 font-medium">
+                    Processing complete! Download link sent to your email.
+                  </p>
+                  <div className="p-4 bg-cyan-500/20 rounded-xl border border-cyan-400/30">
+                    <p className="text-sm text-cyan-200">
+                      📧 Check your email for the download link
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <Button
+                onClick={resetForm}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+              >
+                Create Another Ad 🎯
+              </Button>
+
+              <div className="mt-6 p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl border border-cyan-400/30">
+                <p className="text-sm text-gray-300">
+                  ✨ <strong>Pro Tip:</strong> Each variation is optimized for different platforms and audiences. 
+                  Use them across your marketing campaigns for maximum impact!
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -224,7 +399,7 @@ const AdGraphics = () => {
                     ...prev,
                     variationCount: parseInt(e.target.value) || 1
                   }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/80"
                 />
                 {errors.variationCount && (
                   <p className="text-red-400 text-sm font-medium">{errors.variationCount}</p>
@@ -241,7 +416,7 @@ const AdGraphics = () => {
                   placeholder="Your compelling headline here..."
                   value={formData.headline}
                   onChange={(e) => setFormData(prev => ({ ...prev, headline: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/80"
                   required
                 />
                 {errors.headline && (
@@ -259,7 +434,7 @@ const AdGraphics = () => {
                   placeholder="Supporting text or secondary message..."
                   value={formData.subHeading}
                   onChange={(e) => setFormData(prev => ({ ...prev, subHeading: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/80"
                   required
                 />
                 {errors.subHeading && (
@@ -277,7 +452,7 @@ const AdGraphics = () => {
                   placeholder="• Feature 1&#10;• Feature 2&#10;• Feature 3"
                   value={formData.pointers}
                   onChange={(e) => setFormData(prev => ({ ...prev, pointers: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[100px] placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[100px] placeholder:text-white/80"
                   required
                 />
                 {errors.pointers && (
@@ -295,7 +470,7 @@ const AdGraphics = () => {
                   placeholder="Get Started Today, Learn More, etc."
                   value={formData.cta}
                   onChange={(e) => setFormData(prev => ({ ...prev, cta: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/80"
                   required
                 />
                 {errors.cta && (
@@ -313,7 +488,7 @@ const AdGraphics = () => {
                   placeholder="Sign Up Now, Download Free, etc."
                   value={formData.buttonText}
                   onChange={(e) => setFormData(prev => ({ ...prev, buttonText: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/80"
                   required
                 />
                 {errors.buttonText && (
@@ -332,7 +507,7 @@ const AdGraphics = () => {
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/80"
                   required
                 />
                 {errors.email && (
@@ -396,7 +571,7 @@ const AdGraphics = () => {
                   placeholder="Name, designation, company name, achievements..."
                   value={formData.personDetails}
                   onChange={(e) => setFormData(prev => ({ ...prev, personDetails: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-white/80"
                 />
               </div>
 
@@ -410,7 +585,7 @@ const AdGraphics = () => {
                   placeholder="Add stars, ratings (4.5/5), specific colors, etc."
                   value={formData.otherRequirements}
                   onChange={(e) => setFormData(prev => ({ ...prev, otherRequirements: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-white/60"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-white/80"
                 />
               </div>
 
