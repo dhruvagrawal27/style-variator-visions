@@ -129,7 +129,7 @@ const AdGraphics = () => {
         hasImage: !!formData.imageFile
       });
 
-      const response = await fetch('https://dhruvthc.app.n8n.cloud/webhook-test/28c13a76-b3e0-4486-8bf8-8fc09b25d88c', {
+      const response = await fetch('https://dhruvthc.app.n8n.cloud/webhook/28c13a76-b3e0-4486-8bf8-8fc09b25d88c', {
         method: 'POST',
         body: submitData,
       });
@@ -224,7 +224,7 @@ const AdGraphics = () => {
                     ...prev,
                     variationCount: parseInt(e.target.value) || 1
                   }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
                 />
                 {errors.variationCount && (
                   <p className="text-red-400 text-sm font-medium">{errors.variationCount}</p>
@@ -241,7 +241,7 @@ const AdGraphics = () => {
                   placeholder="Your compelling headline here..."
                   value={formData.headline}
                   onChange={(e) => setFormData(prev => ({ ...prev, headline: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
                   required
                 />
                 {errors.headline && (
@@ -259,7 +259,7 @@ const AdGraphics = () => {
                   placeholder="Supporting text or secondary message..."
                   value={formData.subHeading}
                   onChange={(e) => setFormData(prev => ({ ...prev, subHeading: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
                   required
                 />
                 {errors.subHeading && (
@@ -277,7 +277,7 @@ const AdGraphics = () => {
                   placeholder="• Feature 1&#10;• Feature 2&#10;• Feature 3"
                   value={formData.pointers}
                   onChange={(e) => setFormData(prev => ({ ...prev, pointers: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[100px] placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[100px] placeholder:text-white/60"
                   required
                 />
                 {errors.pointers && (
@@ -295,7 +295,7 @@ const AdGraphics = () => {
                   placeholder="Get Started Today, Learn More, etc."
                   value={formData.cta}
                   onChange={(e) => setFormData(prev => ({ ...prev, cta: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
                   required
                 />
                 {errors.cta && (
@@ -313,7 +313,7 @@ const AdGraphics = () => {
                   placeholder="Sign Up Now, Download Free, etc."
                   value={formData.buttonText}
                   onChange={(e) => setFormData(prev => ({ ...prev, buttonText: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
                   required
                 />
                 {errors.buttonText && (
@@ -332,7 +332,7 @@ const AdGraphics = () => {
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-white/60"
                   required
                 />
                 {errors.email && (
@@ -396,7 +396,7 @@ const AdGraphics = () => {
                   placeholder="Name, designation, company name, achievements..."
                   value={formData.personDetails}
                   onChange={(e) => setFormData(prev => ({ ...prev, personDetails: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-white/60"
                 />
               </div>
 
@@ -410,7 +410,7 @@ const AdGraphics = () => {
                   placeholder="Add stars, ratings (4.5/5), specific colors, etc."
                   value={formData.otherRequirements}
                   onChange={(e) => setFormData(prev => ({ ...prev, otherRequirements: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-gray-400"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-white/60"
                 />
               </div>
 
