@@ -1,4 +1,3 @@
-
 import { Star } from 'lucide-react';
 
 const TestimonialSection = () => {
@@ -7,7 +6,7 @@ const TestimonialSection = () => {
       name: "Sarah Chen",
       role: "Marketing Director",
       company: "TechStart Inc.",
-      content: "ArtForge AI transformed our ad creative process. We're seeing 3x higher conversion rates!",
+      content: "DreamRender AI transformed our ad creative process. We're seeing 3x higher conversion rates!",
       rating: 5
     },
     {

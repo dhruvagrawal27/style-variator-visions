@@ -1,4 +1,3 @@
-
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { Button } from '@/components/ui/button';
@@ -32,7 +31,7 @@ const LandingPage = () => {
             <div className="flex items-center justify-center mb-8">
               <Sparkles className="w-16 h-16 text-purple-400 mr-4 animate-pulse" />
               <h1 className="text-7xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                ArtForge AI
+                DreamRender AI
               </h1>
               <Zap className="w-16 h-16 text-cyan-400 ml-4 animate-pulse" />
             </div>

@@ -19,6 +19,7 @@ interface AdFormData {
   imageFile: File | null;
   personDetails: string;
   otherRequirements: string;
+  resolution: 'square' | 'portrait' | 'landscape';
 }
 
 interface AdResults {
@@ -37,7 +38,8 @@ const AdGraphics = () => {
     email: '',
     imageFile: null,
     personDetails: '',
-    otherRequirements: ''
+    otherRequirements: '',
+    resolution: 'square',
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -120,7 +122,8 @@ const AdGraphics = () => {
       email: '',
       imageFile: null,
       personDetails: '',
-      otherRequirements: ''
+      otherRequirements: '',
+      resolution: 'square',
     });
     setImagePreview(null);
   };
@@ -151,6 +154,7 @@ const AdGraphics = () => {
       submitData.append('email', formData.email);
       submitData.append('personDetails', formData.personDetails);
       submitData.append('otherRequirements', formData.otherRequirements);
+      submitData.append('resolution', formData.resolution);
       
       if (formData.imageFile) {
         submitData.append('image', formData.imageFile);
@@ -404,6 +408,37 @@ const AdGraphics = () => {
                 {errors.variationCount && (
                   <p className="text-red-400 text-sm font-medium">{errors.variationCount}</p>
                 )}
+              </div>
+
+              {/* Resolution Section */}
+              <div className="space-y-3">
+                <label className="text-lg font-semibold text-white block mb-2">🖼️ Resolution</label>
+                <div className="flex gap-6">
+                  <button
+                    type="button"
+                    className={`flex flex-col items-center px-4 py-2 rounded-xl border-2 ${formData.resolution === 'square' ? 'border-cyan-400 bg-cyan-500/10' : 'border-white/20 bg-white/5'} transition-colors`}
+                    onClick={() => setFormData(prev => ({ ...prev, resolution: 'square' }))}
+                  >
+                    <img src="https://img.icons8.com/ios-filled/50/000000/square.png" alt="Square" className="w-8 h-8 mb-1" />
+                    <span className="text-white text-sm">Square<br/>(1:1)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex flex-col items-center px-4 py-2 rounded-xl border-2 ${formData.resolution === 'portrait' ? 'border-cyan-400 bg-cyan-500/10' : 'border-white/20 bg-white/5'} transition-colors`}
+                    onClick={() => setFormData(prev => ({ ...prev, resolution: 'portrait' }))}
+                  >
+                    <img src="https://img.icons8.com/ios-filled/50/000000/portrait.png" alt="Portrait" className="w-8 h-8 mb-1" />
+                    <span className="text-white text-sm">Portrait<br/>(4:5)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex flex-col items-center px-4 py-2 rounded-xl border-2 ${formData.resolution === 'landscape' ? 'border-cyan-400 bg-cyan-500/10' : 'border-white/20 bg-white/5'} transition-colors`}
+                    onClick={() => setFormData(prev => ({ ...prev, resolution: 'landscape' }))}
+                  >
+                    <img src="https://img.icons8.com/ios-filled/50/000000/landscape.png" alt="Landscape" className="w-8 h-8 mb-1" />
+                    <span className="text-white text-sm">Landscape<br/>(16:9)</span>
+                  </button>
+                </div>
               </div>
 
               {/* Headline */}
