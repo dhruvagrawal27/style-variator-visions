@@ -4,27 +4,39 @@
 
 Transform your images into stunning, AI-generated artistic variations with ease. This web app leverages advanced AI models to create multiple stylized versions of your uploaded image, delivering results directly to your inbox.
 
+**Now with Ad Graphics Generation!** Instantly create high-conversion ad graphics for your business, startup, or marketing campaigns using AI.
+
 ---
 
 ## 🚀 Features
 
 - **AI-Powered Image Transformation**: Upload an image or provide a URL to generate unique style variations.
-- **Multiple Variations**: Choose how many styles (1-10) you want for each image.
-- **Quality Selection**: Select from high, medium, or low quality for faster or more detailed results.
+- **Ad Graphics Generation**: Generate professional, conversion-optimized ad graphics with custom headlines, CTAs, and even founder images.
+- **Multiple Variations**: Choose how many styles (1-10) you want for each image or ad.
+- **Quality Selection**: Select from high, medium, or low quality for faster or more detailed results (for art variations).
 - **Instant Preview**: See the first variation instantly in the app.
-- **Email Delivery**: Receive a Google Drive download link for all variations in your email.
+- **Email Delivery**: Receive a Google Drive download link for all variations or ad graphics in your email.
 - **Modern UI**: Built with React, shadcn-ui, and Tailwind CSS for a beautiful, responsive experience.
 
 ---
 
 ## 📸 How It Works
 
+### For Art Variations
 1. **Upload** your image (or paste an image URL).
 2. **Select** the number of variations and desired quality.
 3. **Enter** your email address.
 4. **(Optional)** Add style notes for custom results.
 5. **Submit** the form and let the AI work its magic!
 6. **Preview** the first result instantly and get all variations via email.
+
+### For Ad Graphics Generation
+1. **Fill** in your ad details (headline, subheading, key points, CTA, button text, etc.).
+2. **Upload** an image (optional, e.g., founder photo).
+3. **Select** the number of ad variations and resolution (square, portrait, landscape).
+4. **Enter** your email address.
+5. **Submit** and let the AI generate high-conversion ad graphics!
+6. **Preview** your ad instantly and get all variations via email.
 
 ---
 
