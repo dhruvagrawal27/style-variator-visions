@@ -5,9 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Navigation from '@/components/Navigation';
-import ImageUpload from '@/components/ImageUpload';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { Target } from 'lucide-react';
+import { Target, Upload, X } from 'lucide-react';
 
 interface AdFormData {
   variationCount: number;
@@ -38,6 +37,7 @@ const AdGraphics = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
 
   const validateForm = () => {
@@ -51,6 +51,14 @@ const AdGraphics = () => {
     
     if (!formData.headline.trim()) {
       newErrors.headline = 'Headline is required';
+    }
+    
+    if (!formData.subHeading.trim()) {
+      newErrors.subHeading = 'Sub heading is required';
+    }
+    
+    if (!formData.pointers.trim()) {
+      newErrors.pointers = 'Key points are required';
     }
     
     if (!formData.cta.trim()) {
@@ -67,6 +75,20 @@ const AdGraphics = () => {
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, imageFile: file }));
+      const url = URL.createObjectURL(file);
+      setImagePreview(url);
+    }
+  };
+
+  const clearImage = () => {
+    setFormData(prev => ({ ...prev, imageFile: null }));
+    setImagePreview(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,6 +156,7 @@ const AdGraphics = () => {
         personDetails: '',
         otherRequirements: ''
       });
+      setImagePreview(null);
 
     } catch (error) {
       console.error('Error submitting ad graphics form:', error);
@@ -145,10 +168,6 @@ const AdGraphics = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleImageSelect = (file: File | null) => {
-    setFormData(prev => ({ ...prev, imageFile: file }));
   };
 
   if (isLoading) {
@@ -205,7 +224,7 @@ const AdGraphics = () => {
                     ...prev,
                     variationCount: parseInt(e.target.value) || 1
                   }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
                 />
                 {errors.variationCount && (
                   <p className="text-red-400 text-sm font-medium">{errors.variationCount}</p>
@@ -222,7 +241,7 @@ const AdGraphics = () => {
                   placeholder="Your compelling headline here..."
                   value={formData.headline}
                   onChange={(e) => setFormData(prev => ({ ...prev, headline: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
                   required
                 />
                 {errors.headline && (
@@ -233,29 +252,37 @@ const AdGraphics = () => {
               {/* Sub Heading */}
               <div className="space-y-3">
                 <Label htmlFor="subHeading" className="text-lg font-semibold text-white">
-                  📝 Sub Heading
+                  📝 Sub Heading *
                 </Label>
                 <Input
                   id="subHeading"
                   placeholder="Supporting text or secondary message..."
                   value={formData.subHeading}
                   onChange={(e) => setFormData(prev => ({ ...prev, subHeading: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
+                  required
                 />
+                {errors.subHeading && (
+                  <p className="text-red-400 text-sm font-medium">{errors.subHeading}</p>
+                )}
               </div>
 
               {/* Pointers */}
               <div className="space-y-3">
                 <Label htmlFor="pointers" className="text-lg font-semibold text-white">
-                  ✅ Key Points/Features
+                  ✅ Key Points/Features *
                 </Label>
                 <Textarea
                   id="pointers"
                   placeholder="• Feature 1&#10;• Feature 2&#10;• Feature 3"
                   value={formData.pointers}
                   onChange={(e) => setFormData(prev => ({ ...prev, pointers: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[100px]"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[100px] placeholder:text-gray-400"
+                  required
                 />
+                {errors.pointers && (
+                  <p className="text-red-400 text-sm font-medium">{errors.pointers}</p>
+                )}
               </div>
 
               {/* CTA */}
@@ -268,7 +295,7 @@ const AdGraphics = () => {
                   placeholder="Get Started Today, Learn More, etc."
                   value={formData.cta}
                   onChange={(e) => setFormData(prev => ({ ...prev, cta: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
                   required
                 />
                 {errors.cta && (
@@ -286,7 +313,7 @@ const AdGraphics = () => {
                   placeholder="Sign Up Now, Download Free, etc."
                   value={formData.buttonText}
                   onChange={(e) => setFormData(prev => ({ ...prev, buttonText: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
                   required
                 />
                 {errors.buttonText && (
@@ -305,7 +332,7 @@ const AdGraphics = () => {
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white placeholder:text-gray-400"
                   required
                 />
                 {errors.email && (
@@ -313,7 +340,7 @@ const AdGraphics = () => {
                 )}
               </div>
 
-              {/* Optional Image Upload */}
+              {/* File Upload Only */}
               <div className="space-y-4">
                 <Label className="text-lg font-semibold text-white">
                   📸 Founder/Owner Image (Optional)
@@ -321,9 +348,42 @@ const AdGraphics = () => {
                 <p className="text-sm text-gray-300">
                   Upload a photo of yourself or company founder to include in the ad
                 </p>
-                <ImageUpload
-                  onImageSelect={handleImageSelect}
-                />
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="block w-full p-8 border-2 border-dashed border-cyan-400/50 rounded-2xl text-center cursor-pointer hover:border-cyan-400 transition-colors bg-white/10 backdrop-blur-sm"
+                  >
+                    <Upload className="w-12 h-12 mx-auto mb-4 text-cyan-400" />
+                    <p className="text-lg font-medium text-white mb-2">
+                      {formData.imageFile ? formData.imageFile.name : 'Drop your image here or click to browse'}
+                    </p>
+                    <p className="text-sm text-gray-300">JPG, JPEG, PNG files supported</p>
+                  </label>
+                </div>
+
+                {imagePreview && (
+                  <div className="relative inline-block">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="max-w-full max-h-40 rounded-xl shadow-lg mx-auto block"
+                    />
+                    <button
+                      type="button"
+                      onClick={clearImage}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Person Details */}
@@ -336,7 +396,7 @@ const AdGraphics = () => {
                   placeholder="Name, designation, company name, achievements..."
                   value={formData.personDetails}
                   onChange={(e) => setFormData(prev => ({ ...prev, personDetails: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px]"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-gray-400"
                 />
               </div>
 
@@ -350,7 +410,7 @@ const AdGraphics = () => {
                   placeholder="Add stars, ratings (4.5/5), specific colors, etc."
                   value={formData.otherRequirements}
                   onChange={(e) => setFormData(prev => ({ ...prev, otherRequirements: e.target.value }))}
-                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px]"
+                  className="rounded-xl bg-white/20 backdrop-blur-sm border-cyan-400/30 text-white min-h-[80px] placeholder:text-gray-400"
                 />
               </div>
 
