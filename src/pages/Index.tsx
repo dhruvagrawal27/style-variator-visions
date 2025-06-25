@@ -1,8 +1,15 @@
 
-import FormProvider from '@/components/FormProvider';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  return <FormProvider />;
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    navigate('/');
+  }, [navigate]);
+  
+  return null;
 };
 
 export default Index;
