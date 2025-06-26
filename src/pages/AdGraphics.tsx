@@ -7,6 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import Navigation from '@/components/Navigation';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Target, Upload, X, CheckCircle, Download, Image } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AdFormData {
   variationCount: number;
@@ -20,6 +23,7 @@ interface AdFormData {
   personDetails: string;
   otherRequirements: string;
   resolution: 'square' | 'portrait' | 'landscape';
+  wantHeadlineVariations: boolean;
 }
 
 interface AdResults {
@@ -29,7 +33,7 @@ interface AdResults {
 
 const AdGraphics = () => {
   const [formData, setFormData] = useState<AdFormData>({
-    variationCount: 3,
+    variationCount: 1,
     headline: '',
     subHeading: '',
     pointers: '',
@@ -40,6 +44,7 @@ const AdGraphics = () => {
     personDetails: '',
     otherRequirements: '',
     resolution: 'square',
+    wantHeadlineVariations: false,
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +118,7 @@ const AdGraphics = () => {
   const resetForm = () => {
     setResults(null);
     setFormData({
-      variationCount: 3,
+      variationCount: 1,
       headline: '',
       subHeading: '',
       pointers: '',
@@ -124,6 +129,7 @@ const AdGraphics = () => {
       personDetails: '',
       otherRequirements: '',
       resolution: 'square',
+      wantHeadlineVariations: false,
     });
     setImagePreview(null);
   };
@@ -155,6 +161,7 @@ const AdGraphics = () => {
       submitData.append('personDetails', formData.personDetails);
       submitData.append('otherRequirements', formData.otherRequirements);
       submitData.append('resolution', formData.resolution);
+      submitData.append('wantHeadlineVariations', String(formData.wantHeadlineVariations));
       
       if (formData.imageFile) {
         submitData.append('image', formData.imageFile);
@@ -457,6 +464,20 @@ const AdGraphics = () => {
                 {errors.headline && (
                   <p className="text-red-400 text-sm font-medium">{errors.headline}</p>
                 )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="wantHeadlineVariations"
+                  checked={formData.wantHeadlineVariations}
+                  onCheckedChange={(checked) => {
+                    const isChecked = !!checked;
+                    setFormData({ ...formData, wantHeadlineVariations: isChecked });
+                  }}
+                />
+                <Label htmlFor="wantHeadlineVariations" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Do you want graphics in different variations of headline?
+                </Label>
               </div>
 
               {/* Sub Heading */}
