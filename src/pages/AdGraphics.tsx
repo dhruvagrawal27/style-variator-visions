@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -149,6 +150,11 @@ const AdGraphics = () => {
     setIsLoading(true);
     setErrors({});
 
+    // Calculate dynamic timeout: 1.25 minutes per variation (75 seconds)
+    const timeoutDuration = formData.variationCount * 75 * 1000; // Convert to milliseconds
+    
+    console.log(`Setting timeout for ${formData.variationCount} variations: ${timeoutDuration / 1000} seconds`);
+
     try {
       const submitData = new FormData();
       submitData.append('variationCount', formData.variationCount.toString());
@@ -171,13 +177,24 @@ const AdGraphics = () => {
         variationCount: formData.variationCount,
         headline: formData.headline,
         email: formData.email,
-        hasImage: !!formData.imageFile
+        hasImage: !!formData.imageFile,
+        timeoutDuration: timeoutDuration / 1000 + ' seconds'
       });
+
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, timeoutDuration);
 
       const response = await fetch('https://dhruvthc.app.n8n.cloud/webhook/28c13a76-b3e0-4486-8bf8-8fc09b25d88c', {
         method: 'POST',
         body: submitData,
+        signal: controller.signal,
       });
+
+      // Clear timeout if request completes successfully
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -233,11 +250,26 @@ const AdGraphics = () => {
 
     } catch (error) {
       console.error('Error submitting ad graphics form:', error);
-      toast({
-        title: "Oops! Something went wrong",
-        description: "Our AI is working hard! Please try again in a moment.",
-        variant: "destructive",
-      });
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "Processing Time Extended",
+          description: `Your ${formData.variationCount} ad variation${formData.variationCount > 1 ? 's are' : ' is'} taking longer than expected. We'll send the results to your email once complete.`,
+          variant: "default",
+        });
+      } else if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        toast({
+          title: "Connection Error",
+          description: "Unable to reach our AI service. Please check your internet connection and try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Oops! Something went wrong",
+          description: "Our AI is working hard! Please try again in a moment.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
