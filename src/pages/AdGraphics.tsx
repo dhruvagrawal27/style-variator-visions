@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -150,8 +149,8 @@ const AdGraphics = () => {
     setIsLoading(true);
     setErrors({});
 
-    // Calculate dynamic timeout: 1.25 minutes per variation (75 seconds)
-    const timeoutDuration = formData.variationCount * 75 * 1000; // Convert to milliseconds
+    // Calculate dynamic timeout: 3 minutes per variation (180 seconds)
+    const timeoutDuration = formData.variationCount * 180 * 1000; // Convert to milliseconds
     
     console.log(`Setting timeout for ${formData.variationCount} variations: ${timeoutDuration / 1000} seconds`);
 
